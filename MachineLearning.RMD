@@ -1,0 +1,49 @@
+---
+title: "MachineLearningProject"
+author: "Herpich"
+date: "Tuesday, February 17, 2015"
+output: html_document
+---
+
+EXECUTIVE SUMMARY:
+
+The purpose of this project was to apply machine learning technqiues to a Human Activity Recognition dataset in order to predict outcomes.  The data used was the Weight Lifting Exercises Dataset (see http://groupware.les.inf.puc-rio.br/har).  In this dataset, six participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions, one "correct" and the others representing common mistakes in technique.  Positional measurements were recorded from accelerometers placed in various locations on the participants' bodies.  Training and Testing datasets were provided; the Training dataset consisted of 19,623 individual recordings with category (called "classe") identified, and the Testing dataset consisted of twenty individual recordings with the category removed.  The stated goal was to develop a model which would predict the category of the Testing dataset with a high degree of accuracy while simultaneously being reproducible and feasible on a traditional machine.
+
+PROCESSING DATA:
+
+The Training dataset proved cumbersome, with 160 potential predictors.  The first step post downloading was to remove all predictors with significant whitespace and/or NA values.  This was accomplished by first converting whitespace to NA and subsequently only maintaining predictors with a minimum threshold of data.  Following the initial trim, qualitative variables were also removed (subject, timestamp).  Finally, to reduce the 50+ predictor set even further, Principal Components Analysis was applied.  The training dataset was now reduced to 25 predictors.
+
+TRAINING MODEL:
+
+From the Training data, two subsets were created: Training and Validation (approximately 70% allocated to Training).  This will allow for the proposed model to be tested on a Validation set to estimate out-of-sample error.  On the reduced Training set, a 3-fold cross validation procedure was implemented, and the random forest model was subsequently trained across the folds.  Finally, the best-fit model was applied to the Validation data set, achieving a 97.5% accuracy percentage.  The Confusion Matrix output is shown below.  
+
+
+ESTIMATE OF ACCURACY:
+
+Confusion Matrix Output (K-Fold Cross Validation):
+
+```{r}
+##         Reference
+##Prediction    A    B    C    D    E
+##         A 1659   26    0    0    0
+##         B    9 1096   13    1    2
+##         C    3   15 1003   45    8
+##         D    3    0    8  917    7
+##         E    0    2    2    1 1065
+
+##Overall Statistics
+                                          
+##               Accuracy : 0.9754          
+##                 95% CI : (0.9711, 0.9792)
+##    No Information Rate : 0.2845          
+##    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+##                  Kappa : 0.9688          
+ ##Mcnemar's Test P-Value : NA
+``` 
+ 
+ RESULTS:
+ 
+ With the knowledge of a 95%+ expected out-of-sample accuracy, the model was finally applied to the Testing data set.  The initial results achieved an 18/20 success rate.  The two failures were easily isolated given the Confusion Matrix as part of the cross validation.  As shown in the matrix above, the model's two most significant weaknesses were categorizing "B" as "A" and "D" as "C" likely caused by overlapping attributes in significant positional measurements.
+ 
+ If the sole purpose of the project is to predict with as close to 100% accuracy as possible and resources were not constrained, simplifying the 50+ predictors down to 25 using PCA should be validated prior to final implementation.  However, computing power and time proved limited resources in this project, and I was satisfied with a 95%+ accuracy given the model could be run in 1 hour on a standard laptop.
